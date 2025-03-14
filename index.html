@@ -20,52 +20,85 @@
       form {
         background: linear-gradient(270deg, #65bc6b, #009688);
         border-radius: 10px;
-      }
-      #input {
-        border-radius: 50px;
-        margin-bottom: 5px;
-        padding: 10px 20px;
+        padding: 20px;
       }
       .course-row {
         border: 1px dotted white;
         border-radius: 20px;
+        padding: 15px;
+        position: relative;
+      }
+      .input-style {
+        border-radius: 50px;
+        padding: 10px 20px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+      }
+      select.input-style {
+        appearance: none;
+        background: white;
+        padding: 10px 20px;
       }
     </style>
   </head>
   <body>
     <div class="container my-4">
       <h2 class="text-success text-center fw-bold">Szabist GPA Calculator</h2>
-      <form id="gpaForm" class="p-4">
+      <form id="gpaForm">
         <div id="coursesContainer">
-          <div class="row mb-2 course-row px-2 py-3">
+          <div class="row mb-2 course-row">
             <div class="col-md-4">
               <input
-                id="input"
                 type="text"
                 name="course"
-                placeholder="Course"
+                placeholder="Course Name"
                 required
-                class="form-control"
+                class="form-control input-style"
               />
             </div>
             <div class="col-md-4">
-              <input
-                id="input"
-                type="number"
-                name="marks"
-                placeholder="Marks"
-                required
-                class="form-control"
-              />
+              <select
+                class="form-control input-style"
+                name="grade"
+                onchange="calculateGPA()"
+              >
+                <option value="">Select Grade</option>
+                <option value="4.0">A+</option>
+                <option value="3.75">A</option>
+                <option value="3.5">B+</option>
+                <option value="3.25">B</option>
+                <option value="3.0">C+</option>
+                <option value="2.75">C</option>
+                <option value="2.5">D+</option>
+                <option value="2.0">D</option>
+                <option value="0.0">F</option>
+              </select>
             </div>
             <div class="col-md-4">
               <input
-                id="input"
                 type="number"
                 name="credits"
                 placeholder="Credits"
                 required
-                class="form-control"
+                class="form-control input-style"
+                oninput="calculateGPA()"
+              />
+            </div>
+            <div class="col-md-2 text-center">
+              <img
+                onclick="deleteRow(this)"
+                src="./images/delete.png"
+                style="
+                  width: 24px;
+                  height: 24px;
+                  margin-right: 10px;
+                  cursor: pointer;
+                  position: absolute;
+                  right: -15px;
+                  top: -8px;
+                "
+                alt="remove"
               />
             </div>
           </div>
@@ -75,7 +108,7 @@
           class="d-flex justify-content-between align-items-center px-2 mt-4"
         >
           <div>
-            <h3 style="font-size: 18px" class="text-white">
+            <h3 class="text-white">
               Total GPA: <span id="gpaResult">0.00</span>
             </h3>
           </div>
@@ -89,16 +122,8 @@
                 margin-right: 10px;
                 cursor: pointer;
               "
-              alt=""
+              alt="Add"
             />
-
-            <button
-              type="submit"
-              style="font-size: 12px"
-              class="btn btn-light py-1 px-2"
-            >
-              Submit
-            </button>
           </div>
         </div>
       </form>
@@ -110,60 +135,76 @@
         let container = document.getElementById("coursesContainer");
 
         let newRow = document.createElement("div");
-        newRow.classList.add("row", "mb-2", "course-row", "px-2", "py-3");
+        newRow.classList.add("row", "mb-2", "course-row");
 
         newRow.innerHTML = `
           <div class="col-md-4">
-            <input id="input" type="text" name="course" placeholder="Course" required class="form-control"/>
+            <input type="text" name="course" placeholder="Course Name" required class="form-control input-style"/>
           </div>
           <div class="col-md-4">
-            <input id="input" type="number" name="marks" placeholder="Marks" required class="form-control"/>
+            <select class="form-control input-style" name="grade" onchange="calculateGPA()">
+              <option value="">Select Grade</option>
+              <option value="4.0">A+</option>
+              <option value="3.75">A</option>
+              <option value="3.5">A-</option>
+              <option value="3.25">B+</option>
+              <option value="3.0">B</option>
+              <option value="2.75">B-</option>
+              <option value="2.5">C+</option>
+              <option value="2.25">C+</option>
+              <option value="2.0">C-</option>
+              <option value="0.0">F</option>
+            </select>
           </div>
           <div class="col-md-4">
-            <input id="input" type="number" name="credits" placeholder="Credits" required class="form-control"/>
+            <input type="number" name="credits" placeholder="Credits" required class="form-control input-style" oninput="calculateGPA()"/>
+          </div>
+          <div class="col-md-2 text-center">
+           <img
+                onclick="deleteRow(this)"
+                src="./images/delete.png"
+                style="
+                  width: 24px;
+                  height: 24px;
+                  margin-right: 10px;
+                  cursor: pointer;
+                  position: absolute;
+                  right: -15px;
+                  top: -8px;
+                "
+                alt="remove"
+              />
           </div>
         `;
 
         container.appendChild(newRow);
       }
 
-      document
-        .getElementById("gpaForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          let rows = document.querySelectorAll(".course-row");
-          let totalCredits = 0,
-            totalGradePoints = 0;
+      function deleteRow(button) {
+        button.closest(".course-row").remove();
+        calculateGPA();
+      }
 
-          rows.forEach((row) => {
-            let marks = parseFloat(row.querySelector('[name="marks"]').value);
-            let credits = parseFloat(
-              row.querySelector('[name="credits"]').value
-            );
-            let gpa = getGPA(marks);
+      function calculateGPA() {
+        let rows = document.querySelectorAll(".course-row");
+        let totalCredits = 0,
+          totalGradePoints = 0;
 
-            totalGradePoints += gpa * credits;
-            totalCredits += credits;
-          });
+        rows.forEach((row) => {
+          let gradeInput = row.querySelector('[name="grade"]');
+          let creditsInput = row.querySelector('[name="credits"]');
 
-          let finalGPA = totalCredits
-            ? (totalGradePoints / totalCredits).toFixed(2)
-            : 0.0;
-          document.getElementById("gpaResult").innerText = finalGPA;
+          let grade = parseFloat(gradeInput.value) || 0;
+          let credits = parseFloat(creditsInput.value) || 0;
+
+          totalGradePoints += grade * credits;
+          totalCredits += credits;
         });
 
-      function getGPA(marks) {
-        if (marks >= 90) return 4.0;
-        if (marks >= 85 && marks <= 89) return 3.75;
-        if (marks >= 80 && marks <= 84) return 3.5;
-        if (marks >= 75 && marks <= 79) return 3.25;
-        if (marks >= 70 && marks <= 74) return 3;
-        if (marks >= 66 && marks <= 69) return 2.75;
-        if (marks >= 63 && marks <= 65) return 2.5;
-        if (marks >= 60 && marks <= 62) return 2;
-        if (marks >= 55 && marks <= 59) return 1.5;
-
-        return 0.0;
+        let finalGPA = totalCredits
+          ? (totalGradePoints / totalCredits).toFixed(2)
+          : 0.0;
+        document.getElementById("gpaResult").innerText = finalGPA;
       }
     </script>
 
