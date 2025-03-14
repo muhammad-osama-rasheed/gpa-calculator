@@ -34,11 +34,16 @@
         border: none;
         outline: none;
         font-size: 16px;
+        margin-bottom: 10px;
       }
       select.input-style {
         appearance: none;
         background: white;
         padding: 10px 20px;
+      }
+      option:checked {
+        background-color: #65bc6b !important;
+        color: white;
       }
     </style>
   </head>
@@ -47,7 +52,7 @@
       <h2 class="text-success text-center fw-bold">Szabist GPA Calculator</h2>
       <form id="gpaForm">
         <div id="coursesContainer">
-          <div class="row mb-2 course-row">
+          <div class="row mb-2 course-row mx-2">
             <div class="col-md-4">
               <input
                 type="text"
@@ -90,12 +95,12 @@
                 onclick="deleteRow(this)"
                 src="./images/delete.png"
                 style="
-                  width: 24px;
-                  height: 24px;
+                  width: 26px;
+                  height: 26px;
                   margin-right: 10px;
                   cursor: pointer;
                   position: absolute;
-                  right: -15px;
+                  right: -18px;
                   top: -8px;
                 "
                 alt="remove"
@@ -108,22 +113,30 @@
           class="d-flex justify-content-between align-items-center px-2 mt-4"
         >
           <div>
-            <h3 class="text-white">
+            <h3 style="font-size: 18px" class="text-white">
               Total GPA: <span id="gpaResult">0.00</span>
             </h3>
           </div>
-          <div>
+          <div onclick="addRow(event)" class="d-flex align-items-center">
             <img
-              onclick="addRow(event)"
               src="./images/add.png"
               style="
                 width: 24px;
                 height: 24px;
-                margin-right: 10px;
+                margin-right: 5px;
                 cursor: pointer;
               "
               alt="Add"
             />
+            <span
+              style="
+                color: white;
+                font-weight: 500;
+                font-size: 16px;
+                cursor: pointer;
+              "
+              >Add Course</span
+            >
           </div>
         </div>
       </form>
@@ -135,7 +148,7 @@
         let container = document.getElementById("coursesContainer");
 
         let newRow = document.createElement("div");
-        newRow.classList.add("row", "mb-2", "course-row");
+        newRow.classList.add("row", "mb-2", "course-row", "mx-2");
 
         newRow.innerHTML = `
           <div class="col-md-4">
@@ -164,8 +177,8 @@
                 onclick="deleteRow(this)"
                 src="./images/delete.png"
                 style="
-                  width: 24px;
-                  height: 24px;
+                  width: 28px;
+                  height: 28px;
                   margin-right: 10px;
                   cursor: pointer;
                   position: absolute;
@@ -180,8 +193,8 @@
         container.appendChild(newRow);
       }
 
-      function deleteRow(button) {
-        button.closest(".course-row").remove();
+      function deleteRow(remove) {
+        remove.closest(".course-row").remove();
         calculateGPA();
       }
 
